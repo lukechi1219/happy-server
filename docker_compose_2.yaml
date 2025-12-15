@@ -19,7 +19,7 @@ services:
       # - S3_BUCKET=happy
       # - S3_PUBLIC_URL=http://localhost:9000/happy
     ports:
-      - "127.0.0.1:3000:3000"   # 仅本机可见，配合反向代理最安全
+      - "100.102.75.80:3000:3000"   # 配合 tailscale vpn ip
     depends_on:
       postgres:
         condition: service_healthy
