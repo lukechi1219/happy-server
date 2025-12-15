@@ -8,7 +8,9 @@ services:
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/happy-server
       - REDIS_URL=redis://redis:6379
       - HANDY_MASTER_SECRET=${HANDY_MASTER_SECRET}
-      - PORT=3005
+      - PORT=3000
+      - METRICS_ENABLED=false
+      - DANGEROUSLY_LOG_TO_SERVER_FOR_AI_AUTO_DEBUGGING=
       # S3/MinIO 配置 (可选，取消注释以启用文件存储)
       # - S3_HOST=minio
       # - S3_PORT=9000
@@ -18,7 +20,7 @@ services:
       # - S3_BUCKET=happy
       # - S3_PUBLIC_URL=http://localhost:9000/happy
     ports:
-      - "127.0.0.1:3005:3005"   # 仅本机可见，配合反向代理最安全
+      - "127.0.0.1:3000:3000"   # 仅本机可见，配合反向代理最安全
     depends_on:
       postgres:
         condition: service_healthy
@@ -26,9 +28,9 @@ services:
         condition: service_healthy
       # minio:
       #   condition: service_started
-    command: sh -c "npx prisma migrate deploy --schema /app/prisma/schema.prisma && yarn start"
+    # Uses entrypoint.sh from Dockerfile (runs migration + starts server)
     healthcheck:
-      test: ["CMD-SHELL", "wget -q -O - <http://localhost:3005/health> || exit 1"]
+      test: ["CMD-SHELL", "wget -q -O - http://localhost:3000/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3

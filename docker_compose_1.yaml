@@ -1,4 +1,4 @@
-# docker-compose.yml
+# docker-compose.yml (simple development setup)
 version: '3.8'
 services:
   happy-server:
@@ -8,10 +8,12 @@ services:
     restart: unless-stopped
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=postgresql://postgres:postgres@localhost:5432/happy-server
-      - REDIS_URL=redis://localhost:6379
-      - SEED=your-seed-for-token-generation
-      - PORT=3005
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/happy-server
+      - REDIS_URL=redis://redis:6379
+      - HANDY_MASTER_SECRET=your-secret-for-token-generation
+      - PORT=3000
+      - METRICS_ENABLED=false
+      - DANGEROUSLY_LOG_TO_SERVER_FOR_AI_AUTO_DEBUGGING=
     depends_on:
       - postgres
       - redis
