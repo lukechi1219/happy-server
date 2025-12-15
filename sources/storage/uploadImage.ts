@@ -4,6 +4,9 @@ import { s3bucket, s3client, s3host } from "./files";
 import { db } from "./db";
 
 export async function uploadImage(userId: string, directory: string, prefix: string, url: string, src: Buffer) {
+    if (!s3client) {
+        throw new Error('S3 not configured - cannot upload image');
+    }
 
     // Check if image already exists
     const existing = await db.uploadedFile.findFirst({
