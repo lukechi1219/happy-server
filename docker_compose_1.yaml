@@ -1,5 +1,4 @@
 # docker-compose.yml (simple development setup)
-version: '3.8'
 services:
   happy-server:
     image: happy-server:latest
