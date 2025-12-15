@@ -1,4 +1,4 @@
-# Stage 1: Building the application
+# Stage 1: Build dependencies and generate Prisma client
 FROM node:20-bookworm-slim AS builder
 
 # 安裝 OpenSSL (Prisma 需要) 和編譯工具
@@ -19,7 +19,7 @@ COPY . .
 # 產生 Prisma Client
 RUN npx prisma generate
 
-# Build the Next.js application
+# Type check (no build output, Fastify runs with tsx directly)
 RUN yarn build
 
 # Stage 2: Runtime
@@ -43,14 +43,15 @@ COPY --from=builder /app/tsconfig.json ./tsconfig.json
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/node_modules ./node_modules
 
-# 3. [修正點] 複製 Build Output (假設是 Next.js)
-# 如果是 Next.js 請複製 .next；如果是 NestJS/Express 通常是 dist
-# COPY --from=builder /app/.next ./.next
-# 為了保險起見，這裡保留原本的 sources，但請確認你的 yarn start 到底跑什麼
+# 3. 複製 Source (Fastify with tsx - 直接執行 TypeScript)
 COPY --from=builder /app/sources ./sources
+
+# 4. 複製 entrypoint script
+COPY entrypoint.sh ./entrypoint.sh
+RUN chmod +x entrypoint.sh
 
 # Expose the port the app will run on
 EXPOSE 3000
 
-# Command to run the application
-CMD ["yarn", "start"] 
+# Command to run the application (with migration)
+CMD ["./entrypoint.sh"] 
